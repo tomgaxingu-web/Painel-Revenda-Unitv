@@ -1007,13 +1007,42 @@ async function lCods(){$('codW').innerHTML='<div class="sk" style="height:160px"
 
 // ADMIN DASH
 async function lDash(){
-  try{const[st,ch]=await Promise.all([api('GET','/user/admin/stats'),api('GET','/user/admin/chart')]);
-    $('sGrid').innerHTML=`
-      <div class="sc"><div class="sc-l">Receita Total</div><div class="sc-v cp">R$&nbsp;${parseFloat(st.totalRevenue).toFixed(0)}</div><div class="sc-s">${st.totalOrders} pedidos pagos</div></div>
-      <div class="sc"><div class="sc-l">Hoje</div><div class="sc-v cg">R$&nbsp;${parseFloat(st.todayRevenue).toFixed(0)}</div><div class="sc-s">${st.todayOrders} pedidos</div></div>
-      <div class="sc"><div class="sc-l">Usuários</div><div class="sc-v cb">${st.totalUsers}</div><div class="sc-s">contas ativas</div></div>
-      <div class="sc"><div class="sc-l">Códigos Usados</div><div class="sc-v cy">${st.usedCodes}</div><div class="sc-s">de ${st.totalCodes} total</div></div>`;
+  try{const[d,ch]=await Promise.all([api('GET','/user/admin/dashboard'),api('GET','/user/admin/chart')]);
+    $('dKpi').innerHTML=`
+      <div class="sc"><div class="sc-l">Receita Hoje</div><div class="sc-v cg">${fmt(d.todayRevenue)}</div><div class="sc-s">${d.todayOrders} pedidos pagos hoje</div></div>
+      <div class="sc"><div class="sc-l">Receita do Mês</div><div class="sc-v cp">${fmt(d.monthRevenue)}</div><div class="sc-s">${d.monthOrders} pedidos no mês</div></div>
+      <div class="sc"><div class="sc-l">Receita Total</div><div class="sc-v cy">${fmt(d.totalRevenue)}</div><div class="sc-s">${d.totalOrders} pedidos desde o início</div></div>
+      <div class="sc"><div class="sc-l">Clientes</div><div class="sc-v cb">${d.totalUsers}</div><div class="sc-s">+${d.newUsersMonth} novos neste mês</div></div>
+      <div class="sc"><div class="sc-l">Estoque Disponível</div><div class="sc-v cg">${d.stockTotal}</div><div class="sc-s">códigos de todos os produtos</div></div>
+      <div class="sc"><div class="sc-l">Pagamentos Pendentes</div><div class="sc-v cr">${d.pendingOrders}</div><div class="sc-s">aguardando confirmação PIX</div></div>`;
     drawCh(ch);
+    const lg=p=>p.logo_url?`<img src="${p.logo_url}" alt="">`:`<div class="dlg">${p.name.charAt(0)}</div>`;
+    const maxSt=Math.max(...d.perProduct.map(p=>p.stock),1);
+    $('dStock').innerHTML=d.perProduct.map(p=>`
+      <div class="dstk">${lg(p)}
+        <div class="dsi"><div class="dsn">${p.name}</div>
+          <div class="dbar"><div class="dfill" style="width:${Math.round(p.stock/maxSt*100)}%"></div></div>
+        </div>
+        <div class="dsv ${p.stock===0?'z':''}">${p.stock}</div>
+      </div>`).join('');
+    $('dTop').innerHTML=d.perProduct.slice(0,5).map((p,i)=>`
+      <div class="dtp">
+        <div class="drk ${i<3?'on':''}">${i+1}</div>${lg(p)}
+        <div class="dsi"><div class="dsn">${p.name}</div><div class="dss">${p.sold_qty} vendidos · estoque ${p.stock}</div></div>
+        <div class="dsv">${fmt(p.revenue)}</div>
+      </div>`).join('');
+    $('dOrds').innerHTML=`<div class="tc"><div class="tsc"><table>
+      <thead><tr><th>#</th><th>Cliente</th><th>Produto</th><th>Qtd</th><th>Total</th><th>Status</th><th>Data</th></tr></thead>
+      <tbody>${d.recentOrders.length?d.recentOrders.map(o=>`<tr>
+        <td style="color:var(--t3);font-size:11px">#${o.id}</td>
+        <td style="font-weight:600">${o.user_name}</td>
+        <td style="font-size:13px">${o.product_name}</td>
+        <td>${o.quantity}×</td>
+        <td style="font-weight:700;color:var(--p4)">${fmt(o.total)}</td>
+        <td><span class="chip chip-${o.status==='paid'?'ok':o.status==='pending'?'pe':'er'}">${o.status==='paid'?'Pago':o.status==='pending'?'Pendente':'Cancelado'}</span></td>
+        <td style="color:var(--t3);font-size:11px">${new Date(o.created_at).toLocaleDateString('pt-BR')}</td>
+      </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:18px">Nenhum pedido ainda</td></tr>'}
+      </tbody></table></div></div>`;
   }catch{toast('Erro dashboard','red')}
 }
 function drawCh(data){
