@@ -270,4 +270,22 @@ db.getDashboard = () => {
   return { ...kpi, perProduct, recentOrders };
 };
 
+// Compras recentes para o feed público da capa (nome mascarado por privacidade)
+db.getRecentPurchases = (limit = 8) => {
+  const rows = db.prepare(`
+    SELECT o.quantity, o.paid_at, p.name AS product_name, p.logo_url, u.name AS user_name
+    FROM orders o
+    JOIN users u    ON u.id = o.user_id
+    JOIN products p ON p.id = o.product_id
+    WHERE o.status='paid'
+    ORDER BY o.paid_at DESC, o.id DESC
+    LIMIT ?
+  `).all(limit);
+  return rows.map(r => {
+    const parts = String(r.user_name || '').trim().split(/\s+/);
+    const masked = parts[0] + (parts.length > 1 ? ' ' + parts[parts.length - 1][0].toUpperCase() + '.' : '');
+    return { user: masked, product: r.product_name, logo_url: r.logo_url, qty: r.quantity, paid_at: r.paid_at };
+  });
+};
+
 module.exports = db;

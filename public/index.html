@@ -263,6 +263,39 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .plc-pl{font-size:11px;color:var(--t3)}
 .plc-st{font-size:11px;font-weight:700}
 .plc .bybtn{width:100%;justify-content:center;margin-top:auto}
+/* FEED AO VIVO */
+.lfv{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--t1);margin-bottom:14px}
+.lfv .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:pulse 1.6s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.lfv .lt{font-size:10px;font-weight:800;color:#22c55e;letter-spacing:.6px;background:rgba(34,197,94,.12);padding:3px 8px;border-radius:99px}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:26px}
+.lcard{display:flex;align-items:center;gap:11px;background:var(--s1);border:1.5px solid var(--b1);border-radius:12px;padding:11px 13px}
+.lcard img{width:38px;height:38px;border-radius:9px;object-fit:cover;background:#fff;flex-shrink:0}
+.lcard .li{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--p2),var(--p3));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.lcard .ln{font-size:12px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcard .ls{font-size:11px;color:var(--t3)}
+.lcard .lw{margin-left:auto;font-size:10px;color:#22c55e;font-weight:700;flex-shrink:0}
+#lvT{position:fixed;left:20px;bottom:20px;z-index:901;display:none;align-items:center;gap:11px;background:var(--s2);border:1.5px solid var(--b1);border-radius:14px;padding:11px 15px;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:320px;animation:lvIn .35s ease}
+#lvT.on{display:flex}
+@keyframes lvIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+#lvT img{width:40px;height:40px;border-radius:9px;object-fit:cover;background:#fff}
+#lvT .lt1{font-size:12px;font-weight:700;color:var(--t1)}
+#lvT .lt2{font-size:11px;color:var(--t3);margin-top:2px}
+#lvT .lvdot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0}
+@media(max-width:640px){#lvT{left:12px;right:12px;bottom:76px;max-width:none}}
+/* RODAPÉ */
+.ftr{border-top:1.5px solid var(--b1);margin-top:10px;padding-top:24px;padding-bottom:30px}
+.fbadges{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:22px}
+.fbadge{display:flex;align-items:center;gap:10px;background:var(--s1);border:1.5px solid var(--b1);border-radius:12px;padding:12px 14px}
+.fbadge .fi2{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.fbadge b{font-size:12px;color:var(--t1);display:block}
+.fbadge span{font-size:11px;color:var(--t3)}
+.fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:22px;margin-bottom:20px}
+@media(max-width:720px){.fcols{grid-template-columns:1fr}}
+.fcol h4{font-size:12px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.fcol p,.fcol a{font-size:12px;color:var(--t3);line-height:1.9;text-decoration:none;display:block}
+.fcol a:hover{color:var(--t1)}
+.fcopy{border-top:1px solid var(--b1);padding-top:16px;font-size:11px;color:var(--t3);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .sc-s{font-size:11px;color:var(--t3);margin-top:5px}
 
 /* CHART */
@@ -598,8 +631,40 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
       <span class="hchip">💬 Suporte no WhatsApp</span>
     </div>
   </div>
+  <div id="liveWrap" style="display:none">
+    <div class="lfv"><span class="dot"></span>Compras ao vivo<span class="lt">AO VIVO</span></div>
+    <div class="lgrid" id="lGrid"></div>
+  </div>
   <div id="planos"><div class="ph"><div class="pt">Planos e preços</div><div class="ps">Todas as operadoras disponíveis agora</div></div></div>
   <div class="plgrid" id="plGrid"></div>
+  <div class="ftr">
+    <div class="fbadges">
+      <div class="fbadge"><div class="fi2" style="background:rgba(34,197,94,.14)">🔒</div><div><b>Site 100% seguro</b><span>Conexão criptografada SSL/HTTPS</span></div></div>
+      <div class="fbadge"><div class="fi2" style="background:rgba(168,85,247,.14)">⚡</div><div><b>Entrega automática</b><span>Códigos liberados na hora, 24h por dia</span></div></div>
+      <div class="fbadge"><div class="fi2" style="background:rgba(59,130,246,.14)">💬</div><div><b>Suporte humano</b><span>Atendimento via WhatsApp</span></div></div>
+      <div class="fbadge"><div class="fi2" style="background:rgba(245,158,11,.14)">✅</div><div><b>Pagamento via PIX</b><span>Aprovação instantânea Mercado Pago</span></div></div>
+    </div>
+    <div class="fcols">
+      <div class="fcol">
+        <h4>UnitV Recarga</h4>
+        <p>Plataforma de recargas digitais para revendedores: compre códigos das principais operadoras de TV com pagamento no PIX e entrega automática no painel.</p>
+      </div>
+      <div class="fcol">
+        <h4>Navegação</h4>
+        <a href="#" onclick="go('compras');return false">Central de compras</a>
+        <a href="#" onclick="go('pedidos');return false">Produtos comprados</a>
+        <a href="#" onclick="go('codigos');return false">Meus códigos</a>
+        <a href="#" onclick="go('depositar');return false">Adicionar saldo</a>
+      </div>
+      <div class="fcol">
+        <h4>Pagamento & Suporte</h4>
+        <p>PIX processado pelo Mercado Pago</p>
+        <a href="#" id="fWa" target="_blank" rel="noopener">💬 Falar com o suporte</a>
+        <p>Atendimento todos os dias</p>
+      </div>
+    </div>
+    <div class="fcopy"><span>© 2026 UnitV Recarga · unitvrecarga.com.br</span><span>Todos os direitos reservados</span></div>
+  </div>
 </div>
 
 <!-- COMPRAS -->
@@ -721,6 +786,7 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
 </div>
 
 </div></main>
+<div id="lvT"><img id="lvImg" src="" alt=""/><div><div class="lt1" id="lvTxt"></div><div class="lt2" id="lvSub"></div></div><span class="lvdot"></span></div>
 <a id="wafab" class="wafab" href="#" target="_blank" rel="noopener" title="Suporte via WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
@@ -899,7 +965,7 @@ async function lprods(){
     PRODS=await api('GET','/products');
     const cats=[...new Set(PRODS.map(p=>p.name.split(' ').slice(0,2).join(' ')))];
     $('fcat').innerHTML='<option value="">Todos os produtos</option>'+cats.map(c=>`<option value="${c.toLowerCase()}">${c}</option>`).join('');
-    rP();lInicio();
+    rP();lInicio();lFeed();
   }catch{toast('Erro ao carregar produtos','red')}
 }
 const fmt=v=>'R$ '+parseFloat(v).toFixed(2).replace('.',',');
@@ -927,6 +993,43 @@ function lInicio(){
   }).join('');
 }
 function irCompra(id){go('compras');aCompra(id)}
+
+// FEED DE COMPRAS AO VIVO
+let FEED=[],feeder=null;
+async function lFeed(){
+  try{
+    FEED=await api('GET','/products/feed');
+    const w=$('liveWrap');
+    if(!FEED.length){if(w)w.style.display='none';return}
+    if(!w)return;
+    w.style.display='block';
+    $('lGrid').innerHTML=FEED.slice(0,8).map(f=>`
+      <div class="lcard">${f.logo_url?`<img src="${f.logo_url}" alt=""/>`:`<div class="li">${(f.product||'?').charAt(0)}</div>`}
+        <div style="min-width:0"><div class="ln">${f.user} comprou ${f.qty}×</div><div class="ls">${f.product}</div></div>
+        <div class="lw">${hWhen(f.paid_at)}</div>
+      </div>`).join('');
+    if(!feeder){feeder=setInterval(cycleLive,9000);setTimeout(cycleLive,2500)}
+  }catch{}
+}
+function hWhen(s){
+  if(!s)return'';
+  const d=new Date(String(s).replace(' ','T'));
+  const m=Math.floor((Date.now()-d.getTime())/60000);
+  if(m<1)return'agora mesmo';
+  if(m<60)return'há '+m+' min';
+  const h=Math.floor(m/60);
+  if(h<24)return'há '+h+'h';
+  return d.toLocaleDateString('pt-BR');
+}
+function cycleLive(){
+  if(!FEED.length)return;
+  const f=FEED[Math.floor(Math.random()*Math.min(FEED.length,6))];
+  const img=$('lvImg');img.src=f.logo_url||'';img.style.display=f.logo_url?'block':'none';
+  $('lvTxt').textContent=`${f.user} acabou de comprar`;
+  $('lvSub').textContent=`${f.qty}× ${f.product}`;
+  const t=$('lvT');t.classList.add('on');
+  clearTimeout(cycleLive._h);cycleLive._h=setTimeout(()=>t.classList.remove('on'),4200);
+}
 
 function rP(){
   const cat=$('fcat').value,q=$('srch').value.toLowerCase();
@@ -1253,6 +1356,7 @@ function waBtn(){
   const b=$('wafab');if(!b)return;
   if(!WAPP){b.style.display='none';return}
   b.style.display='flex';b.href=waLink();
+  const fw=$('fWa');if(fw)fw.href=waLink();
 }
 async function lWaPub(){try{const s=await api('GET','/settings/public');WAPP=(s.whatsapp||'').replace(/\D/g,'');waBtn()}catch{}}
 async function lConf(){try{const s=await api('GET','/settings');$('cfWa').value=s.whatsapp||''}catch{}}

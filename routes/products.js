@@ -5,6 +5,9 @@ const { auth, admin } = require('./middleware');
 router.get('/',    auth,        (req, res) => res.json(db.getProductsFull()));
 router.get('/all', auth, admin, (req, res) => res.json(db.getProductsAll()));
 
+// Feed público de compras recentes (prova social na capa)
+router.get('/feed', (req, res) => res.json(db.getRecentPurchases(8)));
+
 router.post('/', auth, admin, (req, res) => {
   const { name, period, badge, sub_title, logo_text, logo_bg, logo_grad, logo_url, stock, tiers, sort_order } = req.body;
   if (!name || !tiers?.length) return res.status(400).json({ error: 'Dados incompletos.' });
