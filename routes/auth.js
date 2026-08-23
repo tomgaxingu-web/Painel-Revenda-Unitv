@@ -2,6 +2,7 @@ const router  = require('express').Router();
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
 const db      = require('../db/database');
+const { auth } = require('./middleware');
 
 const sign = (id, role) => jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
@@ -23,6 +24,17 @@ router.post('/login', (req, res) => {
     return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
   db.prepare("INSERT INTO audit_log (user_id,action) VALUES (?,'login')").run(u.id);
   res.json({ token: sign(u.id, u.role), user: { id: u.id, name: u.name, email: u.email, role: u.role, balance: u.balance } });
+});
+
+router.put('/password', auth, (req, res) => {
+  const { current, next } = req.body;
+  if (!current || !next) return res.status(400).json({ error: 'Preencha todos os campos.' });
+  if (String(next).length < 6) return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
+  const u = db.prepare("SELECT * FROM users WHERE id=?").get(req.user.id);
+  if (!u || !bcrypt.compareSync(current, u.password))
+    return res.status(401).json({ error: 'Senha atual incorreta.' });
+  db.prepare("UPDATE users SET password=? WHERE id=?").run(bcrypt.hashSync(next, 10), u.id);
+  res.json({ ok: true });
 });
 
 module.exports = router;

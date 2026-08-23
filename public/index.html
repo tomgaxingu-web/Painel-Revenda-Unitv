@@ -488,7 +488,7 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
 <div class="al">
   <div class="al-icon">P</div>
   <h1>Painel Unitv Online</h1>
-  <p>Plataforma de revenda digital</p>
+  <p>Painel de recargas e revenda digital</p>
 </div>
 <div id="lBox" class="ab">
   <h2>Bem-vindo de volta</h2>
@@ -782,6 +782,12 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
       <button class="btn btn-p btn-sm" onclick="svConf()">Salvar</button>
       <span style="font-size:12px;color:var(--t3)">O botão verde de suporte aparece no canto inferior direito para os clientes.</span>
     </div>
+  </div>
+  <div class="cp" style="margin-top:16px">
+    <div class="ph" style="padding:0 0 14px"><div class="pt" style="font-size:15px">Alterar minha senha</div></div>
+    <div class="ff"><div class="ffl">Senha atual</div><input class="ffi" type="password" id="pwCur" placeholder="••••••••" autocomplete="current-password"/></div>
+    <div class="ff" style="margin-top:12px"><div class="ffl">Nova senha (mínimo 6 caracteres)</div><input class="ffi" type="password" id="pwNew" placeholder="••••••••" autocomplete="new-password"/></div>
+    <div style="margin-top:16px"><button class="btn btn-p btn-sm" onclick="svPass()">Alterar senha</button></div>
   </div>
 </div>
 
@@ -1359,6 +1365,16 @@ function waBtn(){
   const fw=$('fWa');if(fw)fw.href=waLink();
 }
 async function lWaPub(){try{const s=await api('GET','/settings/public');WAPP=(s.whatsapp||'').replace(/\D/g,'');waBtn()}catch{}}
+async function svPass(){
+  const a=$('pwCur').value,b=$('pwNew').value;
+  if(!a||!b)return toast('Preencha a senha atual e a nova','red');
+  if(b.length<6)return toast('A nova senha deve ter pelo menos 6 caracteres','red');
+  try{
+    await api('PUT','/auth/password',{current:a,next:b});
+    $('pwCur').value='';$('pwNew').value='';
+    toast('Senha alterada com sucesso','green');
+  }catch(e){toast(e.message||'Erro ao alterar senha','red')}
+}
 async function lConf(){try{const s=await api('GET','/settings');$('cfWa').value=s.whatsapp||''}catch{}}
 async function svConf(){
   try{
