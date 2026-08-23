@@ -1,14 +1,20 @@
-# Segredos e dados locais - NUNCA subir
+# Dependências
+node_modules/
+
+# Segredos — NUNCA subir para o Git
 .env
+
+# Banco de dados (dados reais não vão para o repositório)
 db/*.db
 db/*.db-wal
 db/*.db-shm
+
+# Logs e lixo de sistema
+npm-debug.log*
 *.log
+.DS_Store
+Thumbs.db
 
-# Dependências e build
-node_modules/
-
-# Pastas auxiliares
-/deploy/
-/logos/
-snap-tmp.cjs
+# Arquivos grandes sem uso no código
+/por.traineddata
+/unitv dashboard.png

@@ -1,0 +1,24 @@
+PAINEL UNITV - DEPLOY NO SERVIDOR (Oracle Cloud / Ubuntu)
+==========================================================
+
+Dentro do servidor, com o painel-deploy.zip já enviado para a home:
+
+  sudo apt-get install -y unzip
+  sudo mkdir -p /opt/painel
+  cd /opt/painel
+  sudo unzip -o ~/painel-deploy.zip
+  sudo bash setup.sh
+
+Aguarde a construção (3-6 min). No fim, o painel sobe em:
+
+  https://unitvrecarga.com.br
+
+Comandos úteis:
+  sudo docker compose -f docker-compose.prod.yml logs -f     (ver logs)
+  sudo docker compose -f docker-compose.prod.yml restart     (reiniciar)
+  sudo docker compose -f docker-compose.prod.yml up -d --build  (atualizar)
+
+Webhook Mercado Pago (depois que o site estiver no ar):
+  https://unitvrecarga.com.br/api/pay/webhook
+
+O banco de dados fica em /opt/painel/db/painel.db (persistente).

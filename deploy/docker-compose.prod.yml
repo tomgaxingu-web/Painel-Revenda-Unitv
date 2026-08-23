@@ -1,0 +1,27 @@
+services:
+  painel:
+    build: .
+    container_name: painel-unitv
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./db:/app/db
+
+  caddy:
+    image: caddy:2
+    container_name: painel-caddy
+    restart: unless-stopped
+    depends_on:
+      - painel
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

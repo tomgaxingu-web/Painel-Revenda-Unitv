@@ -1,0 +1,4 @@
+unitvrecarga.com.br, www.unitvrecarga.com.br {
+	reverse_proxy painel:3000
+	encode gzip
+}

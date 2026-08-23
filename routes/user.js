@@ -92,6 +92,8 @@ router.get('/admin/stats', auth, admin, (req, res) => res.json(db.getStats()));
 
 router.get('/admin/chart', auth, admin, (req, res) => res.json(db.getSalesChart()));
 
+router.get('/admin/dashboard', auth, admin, (req, res) => res.json(db.getDashboard()));
+
 router.get('/admin/users', auth, admin, (req, res) => {
   const users = db.prepare(`
     SELECT u.*, 

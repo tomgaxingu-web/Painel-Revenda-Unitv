@@ -234,4 +234,40 @@ db.getSalesChart = () => {
   `).all();
 };
 
+// Dashboard admin completo — agrega TODOS os produtos
+db.getDashboard = () => {
+  const kpi = {
+    todayRevenue:  db.prepare("SELECT COALESCE(SUM(total),0) as s FROM orders WHERE status='paid' AND date(paid_at)=date('now','localtime')").get().s,
+    monthRevenue:  db.prepare("SELECT COALESCE(SUM(total),0) as s FROM orders WHERE status='paid' AND strftime('%Y-%m',paid_at)=strftime('%Y-%m','now','localtime')").get().s,
+    totalRevenue:  db.prepare("SELECT COALESCE(SUM(total),0) as s FROM orders WHERE status='paid'").get().s,
+    todayOrders:   db.prepare("SELECT COUNT(*) as c FROM orders WHERE status='paid' AND date(paid_at)=date('now','localtime')").get().c,
+    monthOrders:   db.prepare("SELECT COUNT(*) as c FROM orders WHERE status='paid' AND strftime('%Y-%m',paid_at)=strftime('%Y-%m','now','localtime')").get().c,
+    totalOrders:   db.prepare("SELECT COUNT(*) as c FROM orders WHERE status='paid'").get().c,
+    pendingOrders: db.prepare("SELECT COUNT(*) as c FROM orders WHERE status='pending'").get().c,
+    totalUsers:    db.prepare("SELECT COUNT(*) as c FROM users WHERE role='user'").get().c,
+    newUsersMonth: db.prepare("SELECT COUNT(*) as c FROM users WHERE role='user' AND strftime('%Y-%m',created_at)=strftime('%Y-%m','now','localtime')").get().c,
+    stockTotal:    db.prepare("SELECT COALESCE(SUM(stock),0) as s FROM products WHERE active=1").get().s,
+    usedCodes:     db.prepare("SELECT COUNT(*) as c FROM codes WHERE used=1").get().c,
+    totalCodes:    db.prepare("SELECT COUNT(*) as c FROM codes").get().c,
+  };
+  const perProduct = db.prepare(`
+    SELECT p.id, p.name, p.logo_url, p.stock,
+           COALESCE(SUM(o.quantity),0) AS sold_qty,
+           COALESCE(SUM(o.total),0)    AS revenue
+    FROM products p
+    LEFT JOIN orders o ON o.product_id = p.id AND o.status='paid'
+    GROUP BY p.id
+    ORDER BY revenue DESC, sold_qty DESC
+  `).all();
+  const recentOrders = db.prepare(`
+    SELECT o.id, o.quantity, o.total, o.status, o.created_at,
+           u.name AS user_name, p.name AS product_name
+    FROM orders o
+    JOIN users u    ON u.id = o.user_id
+    JOIN products p ON p.id = o.product_id
+    ORDER BY o.id DESC LIMIT 8
+  `).all();
+  return { ...kpi, perProduct, recentOrders };
+};
+
 module.exports = db;

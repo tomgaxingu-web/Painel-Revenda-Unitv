@@ -214,7 +214,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(circle,rgba(124,58,237,.09) 0%,transparent 70%)}
 .sc-l{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
 .sc-v{font-size:28px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
-.sc-v.cp{color:var(--p4)}.sc-v.cg{color:#34d399}.sc-v.cy{color:#fbbf24}.sc-v.cb{color:#60a5fa}
+.sc-v.cp{color:var(--p4)}.sc-v.cg{color:#34d399}.sc-v.cy{color:#fbbf24}.sc-v.cb{color:#60a5fa}.sc-v.cr{color:var(--red)}
+.dg2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+@media(max-width:920px){.dg2{grid-template-columns:1fr}}
+.dstk,.dtp{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--b1)}
+.dstk:last-child,.dtp:last-child{border-bottom:none;padding-bottom:0}
+.dlg{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--p2),var(--p3));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.dstk img,.dtp img{width:36px;height:36px;border-radius:9px;object-fit:cover;flex-shrink:0;background:#fff}
+.dsi{flex:1;min-width:0}
+.dsn{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dss{font-size:11px;color:var(--t3)}
+.dbar{height:6px;border-radius:4px;background:rgba(255,255,255,.07);margin-top:6px;overflow:hidden}
+.dfill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--p2),var(--p4))}
+.dsv{font-size:14px;font-weight:800;color:var(--t1);flex-shrink:0}
+.dsv.z{color:var(--red)}
+.drk{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--t3);flex-shrink:0}
+.drk.on{background:linear-gradient(135deg,var(--p2),var(--p));color:#fff}
 .sc-s{font-size:11px;color:var(--t3);margin-top:5px}
 
 /* CHART */
@@ -589,11 +604,16 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
 
 <!-- ADM DASH -->
 <div class="page" id="p-adm-dash">
-  <div class="ph"><div class="pt">Dashboard</div><div class="ps">Visão geral da plataforma em tempo real</div></div>
-  <div class="sg" id="sGrid"><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div></div>
+  <div class="ph"><div class="pt">Dashboard</div><div class="ps">Visão geral de todos os produtos em tempo real</div></div>
+  <div class="sg" id="dKpi"><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div><div class="sk" style="height:105px"></div></div>
   <div class="cc"><div class="cc-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Receita — últimos 30 dias</div>
     <div class="cc-w"><canvas id="sChart"></canvas></div>
   </div>
+  <div class="dg2">
+    <div class="cc" style="margin-bottom:0"><div class="cc-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Estoque por produto</div><div id="dStock"></div></div>
+    <div class="cc" style="margin-bottom:0"><div class="cc-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Mais vendidos</div><div id="dTop"></div></div>
+  </div>
+  <div class="cc"><div class="cc-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Últimos pedidos</div><div id="dOrds"></div></div>
 </div>
 
 <!-- ADM PRODUTOS -->
