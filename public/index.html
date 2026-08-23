@@ -230,6 +230,39 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .dsv.z{color:var(--red)}
 .drk{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--t3);flex-shrink:0}
 .drk.on{background:linear-gradient(135deg,var(--p2),var(--p));color:#fff}
+/* CAPA / INÍCIO */
+.hero{position:relative;border-radius:var(--r);padding:38px 34px;margin-bottom:26px;background:linear-gradient(120deg,#1b0b3a 0%,#3b1178 45%,#7c1fa2 75%,#b0258a 100%);overflow:hidden}
+.hero::before,.hero::after{content:'';position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;pointer-events:none}
+.hero::before{width:280px;height:280px;background:#a855f7;top:-120px;right:-60px}
+.hero::after{width:220px;height:220px;background:#ec4899;bottom:-110px;left:22%}
+.hgl{position:relative;z-index:1;max-width:680px}
+.htag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#f5d0fe;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.ht{font-size:30px;line-height:1.18;font-weight:800;color:#fff;margin-bottom:10px}
+.ht em{font-style:normal;background:linear-gradient(90deg,#fbbf24,#fb7185,#e879f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hs{font-size:14px;color:#e9d5ff;margin-bottom:18px}
+.hbtns{display:flex;gap:10px;flex-wrap:wrap}
+.hbtn{border:none;cursor:pointer;font-weight:700;font-size:13px;padding:11px 20px;border-radius:10px;display:inline-flex;align-items:center;gap:8px;transition:transform .15s}
+.hbtn:hover{transform:translateY(-2px)}
+.hbtn.p{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;box-shadow:0 6px 18px rgba(239,68,68,.35)}
+.hbtn.s{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.hchips{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;position:relative;z-index:1}
+.hchip{display:flex;align-items:center;gap:6px;font-size:12px;color:#f3e8ff;background:rgba(255,255,255,.1);padding:6px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.16)}
+@media(max-width:640px){.hero{padding:26px 20px}.ht{font-size:23px}}
+.plgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:16px;margin-bottom:26px}
+.plc{position:relative;background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:transform .18s,border-color .18s,box-shadow .18s}
+.plc:hover{transform:translateY(-4px);border-color:var(--p);box-shadow:0 12px 28px rgba(124,58,237,.28)}
+.plc-h{height:88px;display:flex;align-items:center;justify-content:center;position:relative}
+.plc-h img{max-height:62px;max-width:72%;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
+.plc-h .plg-t{font-size:26px;font-weight:800;color:#fff;letter-spacing:1px}
+.plc-bdg{position:absolute;top:10px;right:10px;font-size:9px;font-weight:800;letter-spacing:.5px;padding:4px 9px;border-radius:99px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;text-transform:uppercase;box-shadow:0 3px 10px rgba(239,68,68,.4)}
+.plc-b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:9px;flex:1}
+.plc-n{font-size:14px;font-weight:700;color:var(--t1)}
+.plc-p{font-size:11px;color:var(--t3);margin-top:2px}
+.plc-pr{display:flex;align-items:baseline;gap:6px}
+.plc-pv{font-size:23px;font-weight:800;background:linear-gradient(90deg,#a78bfa,#e879f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.plc-pl{font-size:11px;color:var(--t3)}
+.plc-st{font-size:11px;font-weight:700}
+.plc .bybtn{width:100%;justify-content:center;margin-top:auto}
 .sc-s{font-size:11px;color:var(--t3);margin-top:5px}
 
 /* CHART */
@@ -465,7 +498,10 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
 </div>
 <div class="sbm">
   <div class="sbs">Menu</div>
-  <div class="ni on" data-p="compras" onclick="go('compras')">
+  <div class="ni on" data-p="inicio" onclick="go('inicio')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Início
+  </div>
+  <div class="ni" data-p="compras" onclick="go('compras')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57l1.65-7.43H6"/></svg>Compras
   </div>
   <div class="ni" data-p="pedidos" onclick="go('pedidos')">
@@ -544,8 +580,30 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
 <!-- MAIN -->
 <main class="main"><div class="pw">
 
+<!-- INÍCIO (CAPA DO CLIENTE) -->
+<div class="page on" id="p-inicio">
+  <div class="hero">
+    <div class="hgl">
+      <div class="htag">✦ Painel de recargas digital</div>
+      <div class="ht">As melhores TVs do Brasil,<br><em>preços de atacado</em> pra você revender</div>
+      <div class="hs">Escolha a operadora, pague no PIX e receba os códigos automaticamente na sua conta.</div>
+      <div class="hbtns">
+        <button class="hbtn p" onclick="document.getElementById('planos').scrollIntoView({behavior:'smooth'})">Ver planos e preços ↓</button>
+        <button class="hbtn s" onclick="go('compras')">Central de compras</button>
+      </div>
+    </div>
+    <div class="hchips">
+      <span class="hchip">⚡ Entrega automática</span>
+      <span class="hchip">🔒 Pagamento seguro</span>
+      <span class="hchip">💬 Suporte no WhatsApp</span>
+    </div>
+  </div>
+  <div id="planos"><div class="ph"><div class="pt">Planos e preços</div><div class="ps">Todas as operadoras disponíveis agora</div></div></div>
+  <div class="plgrid" id="plGrid"></div>
+</div>
+
 <!-- COMPRAS -->
-<div class="page on" id="p-compras">
+<div class="page" id="p-compras">
   <div class="ph"><div class="pt">Compras</div><div class="ps">Cartões digitais com entrega automática após pagamento</div></div>
   <div class="fbar">
     <select class="fsel" id="fcat" onchange="rP()"><option value="">Todos os produtos</option></select>
@@ -775,7 +833,7 @@ function boot(){
   const a=$('auth');a.classList.add('out');setTimeout(()=>a.style.display='none',520);
   $('app').classList.add('on');
   if(USR?.role==='admin')$('aN').style.display='block';
-  lusr();lprods();go('compras');iSSE();
+  lusr();lprods();go('inicio');iSSE();
 }
 
 async function lusr(){
@@ -806,6 +864,7 @@ function go(page){
   $('p-'+page)?.classList.add('on');
   document.querySelector(`.ni[data-p="${page}"]`)?.classList.add('on');
   $('sb').classList.remove('open');$('ov').classList.remove('on');cNf();
+  if(page==='inicio')lInicio();
   if(page==='pedidos')lPeds();
   if(page==='codigos')lCods();
   if(page==='depositar'){lusr();lDepH()}
@@ -840,12 +899,34 @@ async function lprods(){
     PRODS=await api('GET','/products');
     const cats=[...new Set(PRODS.map(p=>p.name.split(' ').slice(0,2).join(' ')))];
     $('fcat').innerHTML='<option value="">Todos os produtos</option>'+cats.map(c=>`<option value="${c.toLowerCase()}">${c}</option>`).join('');
-    rP();
+    rP();lInicio();
   }catch{toast('Erro ao carregar produtos','red')}
 }
 const fmt=v=>'R$ '+parseFloat(v).toFixed(2).replace('.',',');
 function gPrice(p,q){const t=[...p.tiers].sort((a,b)=>b.min_qty-a.min_qty);for(const x of t)if(q>=x.min_qty)return x.price;return p.tiers.slice(-1)[0].price}
 function sC(s){if(s>100)return'var(--green)';if(s>20)return'var(--yellow)';return'var(--red)'}
+
+// CAPA / INÍCIO
+function lInicio(){
+  if(!PRODS.length||!$('plGrid'))return;
+  const minAll=Math.min(...PRODS.map(p=>Math.min(...p.tiers.map(t=>t.price))));
+  $('plGrid').innerHTML=PRODS.map(p=>{
+    const min=[...p.tiers].sort((a,b)=>a.min_qty-b.min_qty)[0];
+    const bg=p.logo_grad||p.logo_bg||'#1e0a3c';
+    const sc=sC(p.stock);
+    const best=min.price===minAll;
+    return `<div class="plc">
+      <div class="plc-h" style="background:${bg}">${p.logo_url?`<img src="${p.logo_url}" alt="${p.name}"/>`:`<span class="plg-t">${p.logo_text||'?'}</span>`}${best?'<div class="plc-bdg">Melhor preço</div>':''}</div>
+      <div class="plc-b">
+        <div><div class="plc-n">${p.name}</div><div class="plc-p">${p.period} · ${p.sub_title||'Cartão de Recarga'}</div></div>
+        <div class="plc-pr"><span class="plc-pv">${fmt(min.price)}</span><span class="plc-pl">/ unidade${min.min_qty>1?' · ≥'+min.min_qty+'×':''}</span></div>
+        <div class="plc-st" style="color:${sc}">${p.stock<1?'✕ Esgotado':'✔ '+p.stock+' em estoque'}</div>
+        <button class="bybtn" ${p.stock<1?'disabled':''} onclick="irCompra(${p.id})">Comprar agora</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function irCompra(id){go('compras');aCompra(id)}
 
 function rP(){
   const cat=$('fcat').value,q=$('srch').value.toLowerCase();
