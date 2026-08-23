@@ -1,0 +1,11 @@
+node_modules
+db/painel.db
+db/painel.db-wal
+db/painel.db-shm
+.env
+*.log
+logos
+README.md
+Dockerfile
+docker-compose.yml
+.dockerignore
