@@ -19,6 +19,7 @@ app.use('/api/auth',     require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/pay',      require('./routes/payments'));
 app.use('/api/user',     require('./routes/user'));
+app.use('/api/settings', require('./routes/settings'));
 
 // Rotas de API desconhecidas → 404 JSON (não servir o HTML do SPA)
 app.use('/api', (req, res) => res.status(404).json({ error: 'Rota não encontrada.' }));

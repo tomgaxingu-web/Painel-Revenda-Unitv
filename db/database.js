@@ -98,6 +98,11 @@ db.exec(`
     created_at TEXT    DEFAULT (datetime('now','localtime'))
   );
 
+  CREATE TABLE IF NOT EXISTS settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+  );
+
   CREATE INDEX IF NOT EXISTS idx_codes_product  ON codes(product_id, used);
   CREATE INDEX IF NOT EXISTS idx_orders_user    ON orders(user_id);
   CREATE INDEX IF NOT EXISTS idx_orders_status  ON orders(status);
