@@ -30,6 +30,5 @@ app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n🚀 Painel Unitv online → http://localhost:${PORT}`);
-  console.log(`   Admin: admin@painel.com / admin123`);
   console.log(`   Webhook: POST /api/pay/webhook\n`);
 });

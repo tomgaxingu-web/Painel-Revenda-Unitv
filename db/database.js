@@ -140,7 +140,7 @@ LOGO_MAP.forEach(([name, url]) => updLogo.run(url, `%${name}%`));
 
 // ── SEED ADMIN ────────────────────────────────────────────────
 if (!db.prepare("SELECT id FROM users WHERE email='admin@painel.com'").get()) {
-  const hash = bcrypt.hashSync('admin123', 10);
+  const hash = bcrypt.hashSync('TroqueEstaSenhaAdminImediatamente!', 10);
   db.prepare("INSERT INTO users (name,email,password,role) VALUES (?,?,?,'admin')")
     .run('Administrador', 'admin@painel.com', hash);
 }

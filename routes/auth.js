@@ -4,9 +4,21 @@ const jwt     = require('jsonwebtoken');
 const db      = require('../db/database');
 const { auth } = require('./middleware');
 
+// Rate limit simples: 5 tentativas por minuto por IP
+const attempts = {};
+function rateLimit(req, res, next) {
+  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  const now = Date.now();
+  if (!attempts[ip]) attempts[ip] = { count: 0, reset: now + 60000 };
+  if (now > attempts[ip].reset) { attempts[ip] = { count: 0, reset: now + 60000 }; }
+  attempts[ip].count++;
+  if (attempts[ip].count > 5) return res.status(429).json({ error: 'Muitas tentativas. Tente novamente em 1 minuto.' });
+  next();
+}
+
 const sign = (id, role) => jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-router.post('/register', (req, res) => {
+router.post('/register', rateLimit, (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) return res.status(400).json({ error: 'Preencha todos os campos.' });
   if (db.prepare("SELECT id FROM users WHERE email=?").get(email))
@@ -17,7 +29,7 @@ router.post('/register', (req, res) => {
   res.json({ token: sign(r.lastInsertRowid, 'user'), user: { id: r.lastInsertRowid, name, email, role: 'user', balance: 0 } });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', rateLimit, (req, res) => {
   const { email, password } = req.body;
   const u = db.prepare("SELECT * FROM users WHERE email=?").get(email);
   if (!u || !bcrypt.compareSync(password, u.password))
