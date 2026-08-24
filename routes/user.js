@@ -128,6 +128,11 @@ router.put('/admin/users/:id/balance', auth, admin, (req, res) => {
   res.json({ balance: u.balance });
 });
 
+router.get('/admin/tickets', auth, admin, (req, res) => {
+  const tickets = db.prepare("SELECT t.*, u.name as user_name, u.email FROM tickets t JOIN users u ON u.id=t.user_id ORDER BY t.created_at DESC").all();
+  res.json(tickets);
+});
+
 router.get('/admin/orders', auth, admin, (req, res) => {
   const { page = 1, status } = req.query;
   const limit = 50, offset = (page - 1) * limit;
