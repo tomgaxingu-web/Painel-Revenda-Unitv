@@ -1469,6 +1469,8 @@ async function createTicket(){
   try{
     await api('POST','/user/tickets',{subject:s,message:m});
     $('supSubject').value='';$('supMessage').value='';
+    // Esconde mensagem "Nenhum ticket em aberto"
+    document.querySelector('#p-suporte > .emp').style.display='none';
     showTicketAlert();
     toast('Ticket criado com sucesso','green');
     lTickets();
