@@ -1136,6 +1136,9 @@ function aPix(data,title){
         $('pxSt').className='pxst ok';$('pxSt').innerHTML='✅ Pagamento aprovado!';
         await lusr();await lprods();if(d.unread>0)$('ndot').classList.add('on');
         setTimeout(()=>{fPix();go('codigos')},2000);
+      }else if(d.status==='rejected'||d.status==='cancelled'){
+        clearInterval(pxPoll);clearInterval(pxCd);
+        $('pxSt').className='pxst pe';$('pxSt').innerHTML='❌ Pagamento '+(d.status==='rejected'?'recusado pelo Mercado Pago. Tente novamente com outro método/valor':'cancelado')+'.';
       }
     }catch{}
   },5000);
