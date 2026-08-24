@@ -19,15 +19,18 @@ function cpfValido(v) {
 
 // CPF usado SOMENTE na transação: vai direto ao Mercado Pago no payload do pagamento
 // e NUNCA é gravado em nosso banco de dados.
-async function createPixPayment(amount, description, email, name, cpf) {
+async function createPixPayment(amount, description, email, name, cpf, external_reference) {
   const payer = { email, first_name: name };
   if (cpf) payer.identification = { type: 'CPF', number: cpf };
-  const { data } = await axios.post('https://api.mercadopago.com/v1/payments', {
+  const payload = {
     transaction_amount: parseFloat(amount),
     description,
     payment_method_id: 'pix',
-    payer
-  }, { headers: HDR() });
+    payer,
+    notification_url: 'https://lavish-cooperation-production-2575.up.railway.app/api/pay/webhook',
+    external_reference: String(external_reference || ''),
+  };
+  const { data } = await axios.post('https://api.mercadopago.com/v1/payments', payload, { headers: HDR() });
   return {
     id: String(data.id),
     status: data.status,
@@ -44,10 +47,13 @@ router.post('/deposit', auth, async (req, res) => {
   if (!cpfValido(cpf)) return res.status(400).json({ error: 'CPF inválido. Confira os números e tente novamente.' });
   const user = db.prepare("SELECT * FROM users WHERE id=?").get(req.user.id);
   try {
-    const pix = await createPixPayment(amount, `Depósito PanelReseller - ${user.name}`, user.email, user.name, cpf);
-    const dep = db.prepare("INSERT INTO deposits (user_id,amount,mp_payment_id,mp_qr_code,mp_qr_b64) VALUES (?,?,?,?,?)")
-      .run(req.user.id, amount, pix.id, pix.qr_code, pix.qr_code_base64);
-    res.json({ deposit_id: dep.lastInsertRowid, ...pix });
+    // Cria registro primeiro para ter o ID interno como external_reference
+    const depInsert = db.prepare("INSERT INTO deposits (user_id,amount,status) VALUES (?,?,?)").run(req.user.id, amount, 'pending');
+    const deposit_id = depInsert.lastInsertRowid;
+    const pix = await createPixPayment(amount, `Depósito PanelReseller - ${user.name}`, user.email, user.name, cpf, deposit_id);
+    db.prepare("UPDATE deposits SET mp_payment_id=?, mp_qr_code=?, mp_qr_b64=? WHERE id=?")
+      .run(pix.id, pix.qr_code, pix.qr_code_base64, deposit_id);
+    res.json({ deposit_id, ...pix });
   } catch(e) {
     console.error('MP deposit error:', e.response?.data || e.message);
     res.status(500).json({ error: 'Erro ao gerar PIX. Verifique o token MP.' });
@@ -68,10 +74,14 @@ router.post('/order', auth, async (req, res) => {
   const avail      = db.prepare("SELECT COUNT(*) as c FROM codes WHERE product_id=? AND used=0").get(product_id).c;
   if (avail < quantity) return res.status(400).json({ error: `Estoque insuficiente. Disponível: ${avail}` });
   try {
-    const pix = await createPixPayment(total, `${product.name} ×${quantity}`, user.email, user.name, cpf);
-    const ord = db.prepare("INSERT INTO orders (user_id,product_id,quantity,unit_price,total,status,mp_payment_id,mp_qr_code,mp_qr_b64) VALUES (?,?,?,?,?,'pending',?,?,?)")
-      .run(req.user.id, product_id, quantity, unit_price, total, pix.id, pix.qr_code, pix.qr_code_base64);
-    res.json({ order_id: ord.lastInsertRowid, total, unit_price, ...pix });
+    // Cria registro primeiro para ter o ID interno como external_reference
+    const ordInsert = db.prepare("INSERT INTO orders (user_id,product_id,quantity,unit_price,total,status) VALUES (?,?,?,?,?,?)")
+      .run(req.user.id, product_id, quantity, unit_price, total, 'pending');
+    const order_id = ordInsert.lastInsertRowid;
+    const pix = await createPixPayment(total, `${product.name} ×${quantity}`, user.email, user.name, cpf, order_id);
+    db.prepare("UPDATE orders SET mp_payment_id=?, mp_qr_code=?, mp_qr_b64=? WHERE id=?")
+      .run(pix.id, pix.qr_code, pix.qr_code_base64, order_id);
+    res.json({ order_id, total, unit_price, ...pix });
   } catch(e) {
     console.error('MP order error:', e.response?.data || e.message);
     res.status(500).json({ error: 'Erro ao gerar PIX.' });
