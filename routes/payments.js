@@ -15,7 +15,7 @@ async function createPixPayment(amount, description, email, name) {
     payer: { email, first_name: name }
   }, { headers: HDR() });
   return {
-    id: data.id,
+    id: String(data.id),
     status: data.status,
     qr_code:        data.point_of_interaction?.transaction_data?.qr_code || '',
     qr_code_base64: data.point_of_interaction?.transaction_data?.qr_code_base64 || '',
@@ -90,6 +90,7 @@ const creditDeposit = db.transaction((dep) => {
 
 // Liquida depósito ou pedido pendente pelo ID do pagamento MP (idempotente)
 function settlePayment(mpId) {
+  mpId = String(mpId).replace(/\D/g, '');
   const dep = db.prepare("SELECT * FROM deposits WHERE mp_payment_id=? AND status='pending'").get(mpId);
   if (dep) {
     creditDeposit(dep);
@@ -141,9 +142,10 @@ router.post('/webhook', async (req, res) => {
 
 // GET /api/pay/check/:mp_id  (polling do frontend durante o checkout)
 router.get('/check/:mp_id', auth, async (req, res) => {
+  const mpId = String(req.params.mp_id).replace(/\D/g, '');
   try {
-    const pay = await fetchMP(req.params.mp_id);
-    if (pay.status === 'approved') settlePayment(String(req.params.mp_id));
+    const pay = await fetchMP(mpId);
+    if (pay.status === 'approved') settlePayment(mpId);
     const user = db.prepare("SELECT balance FROM users WHERE id=?").get(req.user.id);
     const unread = db.prepare("SELECT COUNT(*) as c FROM notifications WHERE user_id=? AND read=0").get(req.user.id).c;
     res.json({ status: pay.status, balance: user.balance, unread });

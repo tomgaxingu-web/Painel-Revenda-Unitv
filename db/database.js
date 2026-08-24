@@ -116,6 +116,11 @@ if (!db.prepare("PRAGMA table_info(products)").all().some(c => c.name === 'logo_
   db.exec("ALTER TABLE products ADD COLUMN logo_url TEXT");
 }
 
+// ── MIGRATION: mp_payment_id gravado como float ("175327726436.0")
+// quebrava o casamento no webhook/poller/check. Normaliza para dígitos.
+db.exec("UPDATE orders   SET mp_payment_id = REPLACE(CAST(mp_payment_id AS TEXT),'.0','') WHERE mp_payment_id LIKE '%.0'");
+db.exec("UPDATE deposits SET mp_payment_id = REPLACE(CAST(mp_payment_id AS TEXT),'.0','') WHERE mp_payment_id LIKE '%.0'");
+
 // Backfill: associa as imagens da pasta /logos aos produtos existentes
 const LOGO_MAP = [
   ['TV Express', '/logos/tvexpress.png'],
