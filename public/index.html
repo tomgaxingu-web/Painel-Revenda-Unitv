@@ -544,6 +544,9 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
   <div class="ni" data-p="codigos" onclick="go('codigos')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Meus Códigos
   </div>
+  <div class="ni" data-p="suporte" onclick="go('suporte')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v16M5.6 5.6l5.657 5.657-1.414 1.414M2 12l4 16 16-4"/><circle cx="9" cy="9" r="3"/></svg>Suporte
+  </div>
   <div class="sep"></div>
   <div class="sbs">Financeiro</div>
   <div class="ni" data-p="depositar" onclick="go('depositar')">
@@ -691,6 +694,33 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
 <div class="page" id="p-codigos">
   <div class="ph"><div class="pt">Meus Códigos</div><div class="ps">Todos os códigos entregues após pagamento confirmado</div></div>
   <div id="codW"></div>
+</div>
+
+<!-- SUPORTE -->
+<div class="page" id="p-suporte">
+  <div class="ph"><div class="pt">Central de Atendimento</div></div>
+  <div class="emp" style="padding:40px 20px;text-align:center">
+    <div class="eic" style="width:64px;height:64px;margin:0 auto 24px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </div>
+    <div>
+      <p class="ep">Nenhum ticket em aberto</p>
+      <p class="es">Você pode criar um novo ticket abaixo</p>
+    </div>
+  </div>
+  <div class="cp" style="margin-top:24px">
+    <div class="cp-t">Novo Ticket</div>
+    <div class="ff"><div class="ffl">Assunto</div><input class="ffi" id="supSubject" placeholder="Assunto do ticket" style="font-size:14px"/></div>
+    <div class="ff" style="margin-top:12px"><div class="ffl">Mensagem</div><textarea class="ffta" id="supMessage" rows="3" style="font-size:13px;resize:vertical;min-height:80px"></textarea></div>
+    <div style="margin-top:18px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-s" onclick="go('codigos')">Cancelar</button>
+      <button class="btn btn-p" onclick="createTicket()">Criar Ticket</button>
+    </div>
+  </div>
+  <div id="supTickets" style="margin-top:32px;display:none">
+    <div class="ph"><div class="pt">Meus Tickets</div></div>
+    <div class="emp" style="padding:20px 20px;text-align:center;color:var(--t3)">Nenhum ticket encontrado</div>
+  </div>
 </div>
 
 <!-- DEPOSITAR -->
@@ -964,6 +994,7 @@ function go(page){
   if(page==='inicio')lInicio();
   if(page==='pedidos')lPeds();
   if(page==='codigos')lCods();
+  if(page==='suporte'){}
   if(page==='depositar'){lusr();lDepH()}
   if(page==='adm-dash')lDash();
   if(page==='adm-prod')aPrds();

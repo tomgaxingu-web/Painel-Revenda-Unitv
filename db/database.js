@@ -99,9 +99,14 @@ db.exec(`
     created_at TEXT    DEFAULT (datetime('now','localtime'))
   );
 
-  CREATE TABLE IF NOT EXISTS settings (
-    key   TEXT PRIMARY KEY,
-    value TEXT
+  CREATE TABLE IF NOT EXISTS tickets (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id),
+    subject    TEXT    NOT NULL,
+    message    TEXT    NOT NULL,
+    status     TEXT    DEFAULT 'aberto',
+    created_at TEXT    DEFAULT (datetime('now','localtime')),
+    resolved_at TEXT
   );
 
   CREATE INDEX IF NOT EXISTS idx_codes_product  ON codes(product_id, used);
