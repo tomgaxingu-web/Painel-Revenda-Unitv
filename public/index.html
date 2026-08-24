@@ -175,7 +175,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .bdg{font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;white-space:nowrap}
 .bdg-MENSAL{background:rgba(124,58,237,.2);color:var(--p4);border:1px solid rgba(124,58,237,.32)}
 .bdg-ANUAL{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.28)}
-.pc-s{font-size:12px;color:var(--t3)}
+.pc-s{font-size:12px;color:#fff}
 
 /* PRICE GRID */
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:8px;margin-bottom:18px}
@@ -257,7 +257,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .plc-bdg{position:absolute;top:10px;right:10px;font-size:9px;font-weight:800;letter-spacing:.5px;padding:4px 9px;border-radius:99px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;text-transform:uppercase;box-shadow:0 3px 10px rgba(239,68,68,.4)}
 .plc-b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:9px;flex:1}
 .plc-n{font-size:14px;font-weight:700;color:var(--t1)}
-.plc-p{font-size:11px;color:var(--t3);margin-top:2px}
+.plc-p{font-size:11px;color:#fff;margin-top:2px}
 .plc-pr{display:flex;align-items:baseline;gap:6px}
 .plc-pv{font-size:23px;font-weight:800;background:linear-gradient(90deg,#a78bfa,#e879f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .plc-pl{font-size:11px;color:var(--t3)}
@@ -500,6 +500,7 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
   <input class="fi" type="password" id="lP" placeholder="••••••••" autocomplete="current-password"/>
   <button class="btn-auth" onclick="doLogin()">Entrar na plataforma</button>
   <div class="af">Não tem conta? <span onclick="showReg()">Criar conta grátis</span></div>
+  <div class="af" style="margin-top:10px;font-size:11px">Ao criar sua conta você concorda com nossa <a href="/privacidade.html" target="_blank" rel="noopener" style="color:var(--t2);text-decoration:underline">Política de Privacidade</a></div>
 </div>
 <div id="rBox" class="ab" style="display:none">
   <h2>Criar conta</h2>
@@ -663,7 +664,7 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
         <p>Atendimento todos os dias</p>
       </div>
     </div>
-    <div class="fcopy"><span>© 2026 UnitV Recarga</span><span>Todos os direitos reservados</span></div>
+    <div class="fcopy"><span>© 2026 UnitV Recarga</span><span>Todos os direitos reservados</span><a href="/privacidade.html" target="_blank" rel="noopener" style="color:var(--t3);text-decoration:none">Política de Privacidade</a></div>
   </div>
 </div>
 
