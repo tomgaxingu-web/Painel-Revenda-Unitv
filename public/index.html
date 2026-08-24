@@ -1123,7 +1123,7 @@ function aPix(data,title){
   const img=$('pxImg'),ph=$('pxPh');
   if(data.qr_code_base64){img.src='data:image/png;base64,'+data.qr_code_base64;img.style.display='block';ph.style.display='none'}
   else{img.style.display='none';ph.innerHTML='<span style="font-size:12px;color:#777;text-align:center;padding:16px">QR indisponível em teste.<br>Use o código copia e cola abaixo.</span>';ph.style.display='flex'}
-  pxId=data.mp_payment_id;om('mPix');
+  pxId=data.id||data.mp_payment_id;om('mPix');
   pxSecs=1800;clearInterval(pxCd);
   pxCd=setInterval(()=>{pxSecs--;const m=Math.floor(pxSecs/60),s=pxSecs%60;
     $('pxTm').textContent=`⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
