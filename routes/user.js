@@ -86,6 +86,20 @@ router.post('/notifications/read', auth, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── TICKETS ─────────────────────────────────────────────────────
+router.post('/tickets', auth, (req, res) => {
+  const { subject, message } = req.body;
+  if (!subject || !message) return res.status(400).json({ error: 'Assunto e mensagem são obrigatórios.' });
+  db.prepare("INSERT INTO tickets (user_id,subject,message,status) VALUES (?,?,?,?)")
+    .run(req.user.id, subject, message, 'aberto');
+  res.json({ ok: true, id: db.lastInsertRowid });
+});
+
+router.get('/tickets', auth, (req, res) => {
+  const tickets = db.prepare("SELECT * FROM tickets WHERE user_id=? ORDER BY created_at DESC").all(req.user.id);
+  res.json(tickets);
+});
+
 // ── ADMIN ─────────────────────────────────────────────────────
 
 router.get('/admin/stats', auth, admin, (req, res) => res.json(db.getStats()));
@@ -118,7 +132,7 @@ router.get('/admin/orders', auth, admin, (req, res) => {
   const { page = 1, status } = req.query;
   const limit = 50, offset = (page - 1) * limit;
   let q = `SELECT o.*, u.name as user_name, u.email, p.name as product_name, p.badge
-           FROM orders o JOIN users u ON u.id=o.user_id JOIN products p ON p.id=o.product_id`;
+         FROM orders o JOIN users u ON u.id=o.user_id JOIN products p ON p.id=o.product_id`;
   const params = [];
   if (status) { q += ' WHERE o.status=?'; params.push(status); }
   q += ' ORDER BY o.id DESC LIMIT ? OFFSET ?';

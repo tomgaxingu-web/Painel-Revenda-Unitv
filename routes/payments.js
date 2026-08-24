@@ -89,7 +89,7 @@ router.post('/order', auth, async (req, res) => {
 });
 
 // POST /api/pay/balance  (saldo)
-router.post('/balance', auth, (req, res) => {
+router.post('/balance', auth, async (req, res) => {
   const { product_id, quantity } = req.body;
   if (!product_id || !quantity || quantity < 1) return res.status(400).json({ error: 'Dados inválidos.' });
   const user    = db.prepare("SELECT * FROM users WHERE id=?").get(req.user.id);
@@ -100,6 +100,8 @@ router.post('/balance', auth, (req, res) => {
   if (user.balance < total) return res.status(400).json({ error: `Saldo insuficiente. Disponível: R$ ${user.balance.toFixed(2)}` });
   try {
     const result = db.deliverCodes(req.user.id, product_id, quantity, unit_price, total, null);
+    // Send email notification after purchase
+    await sendPurchaseEmail(req.user.id, total, product_id, quantity);
     const updated = db.prepare("SELECT balance FROM users WHERE id=?").get(req.user.id);
     res.json({ ...result, balance: updated.balance });
   } catch(e) { res.status(400).json({ error: e.message }); }
@@ -131,6 +133,8 @@ function settlePayment(mpId) {
   if (ord) {
     try { db.deliverCodes(ord.user_id, ord.product_id, ord.quantity, ord.unit_price, ord.total, ord.id); }
     catch (e) { console.error('[settle] deliverCodes error:', e.message); return null; }
+    // Send email notification after order confirmed
+    sendPurchaseEmail(ord.user_id, ord.total, ord.product_id, ord.quantity);
     console.log(`✅ [settle] Pedido #${ord.id} aprovado`);
     return 'order';
   }
@@ -181,3 +185,34 @@ router.get('/check/:mp_id', auth, async (req, res) => {
 });
 
 module.exports = router;
+
+// ── EMAIL NOTIFICATION ─────────────────────────────────────────
+async function sendPurchaseEmail(userId, total, productId, quantity) {
+  try {
+    const nodemailer = require('nodemailer');
+    const user = db.prepare("SELECT email, name FROM users WHERE id=?").get(userId);
+    if (!user || !user.email) return;
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+      port: Number(process.env.EMAIL_PORT) || 587,
+      secure: Number(process.env.EMAIL_PORT) || 587 === 465,
+      auth: {
+        user: process.env.EMAIL_USER || 'sua_email@gmail.com',
+        pass: process.env.EMAIL_PASS || 'sua_senha_de_app',
+      },
+    });
+
+    const emailText = `Olá ${user.name || 'usuário'},\n\nSua compra foi confirmada com sucesso!\n\nDetalhes:\n- ${quantity}× código(s) de recarga\n- Produto: consulta em "Meus Códigos"\n- Valor pago: R$ ${total.toFixed(2)}\n\nSeus códigos estão disponíveis na aba "Meus Codigos" do painel.\n\nObrigado por comprar com a Unitv!\n---\nEste é um e-mail automático, por favor não responda.\n\nAtenciosamente,\nEquipe Unitv`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || 'Painel Unitv <no-reply@seusite.com>',
+      to: user.email,
+      subject: '🎉 Compra confirmada - Unitv',
+      text: emailText,
+    });
+    console.log(`📧 [email] Notificação enviada para ${user.email} após compra product_id=${productId}`);
+  } catch (e) {
+    console.error('[email] falha ao enviar notificação:', e.message);
+  }
+}

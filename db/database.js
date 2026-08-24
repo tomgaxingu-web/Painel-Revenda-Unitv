@@ -1,6 +1,7 @@
 const Database = require('better-sqlite3');
 const bcrypt   = require('bcryptjs');
 const path     = require('path');
+const fs       = require('fs');
 
 const DB_FILE = process.env.DB_PATH || path.join(__dirname, 'painel.db');
 const db = new Database(DB_FILE);
@@ -98,9 +99,14 @@ db.exec(`
     created_at TEXT    DEFAULT (datetime('now','localtime'))
   );
 
-  CREATE TABLE IF NOT EXISTS settings (
-    key   TEXT PRIMARY KEY,
-    value TEXT
+  CREATE TABLE IF NOT EXISTS tickets (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id),
+    subject    TEXT    NOT NULL,
+    message    TEXT    NOT NULL,
+    status     TEXT    DEFAULT 'aberto',
+    created_at TEXT    DEFAULT (datetime('now','localtime')),
+    resolved_at TEXT
   );
 
   CREATE INDEX IF NOT EXISTS idx_codes_product  ON codes(product_id, used);
@@ -292,5 +298,26 @@ db.getRecentPurchases = (limit = 8) => {
     return { user: masked, product: r.product_name, logo_url: r.logo_url, qty: r.quantity, paid_at: r.paid_at };
   });
 };
+
+// ── BACKUP AUTOMÁTICO DO BANCO ────────────────────────────────
+// Usa o backup online do SQLite (seguro com o banco em uso).
+// Roda ~15s após o start e depois 1× por dia; mantém os 7 mais recentes.
+const BACKUP_DIR = path.join(path.dirname(DB_FILE), 'backups');
+db.dbFile    = DB_FILE;
+db.backupDir = BACKUP_DIR;
+function runBackup() {
+  try {
+    fs.mkdirSync(BACKUP_DIR, { recursive: true });
+    const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+    const dest = path.join(BACKUP_DIR, `painel-${stamp}.db`);
+    db.backup(dest).then(() => {
+      const files = fs.readdirSync(BACKUP_DIR).filter(f => f.endsWith('.db')).sort();
+      while (files.length > 7) { try { fs.unlinkSync(path.join(BACKUP_DIR, files.shift())); } catch {} }
+      console.log(`💾 [backup] OK: ${path.basename(dest)}`);
+    }).catch(e => console.error('[backup] falha:', e.message));
+  } catch (e) { console.error('[backup] falha:', e.message); }
+}
+setTimeout(runBackup, 15000);
+setInterval(runBackup, 24 * 60 * 60 * 1000);
 
 module.exports = db;
