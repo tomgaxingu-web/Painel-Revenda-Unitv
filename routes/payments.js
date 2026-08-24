@@ -4,6 +4,8 @@ const { v4: uuid } = require('uuid');
 const db     = require('../db/database');
 const { auth } = require('./middleware');
 
+const MP_WEBHOOK_URL = process.env.MP_WEBHOOK_URL || 'https://lavish-cooperation-production-2575.up.railway.app/api/pay/webhook';
+
 const MP  = () => process.env.MP_ACCESS_TOKEN;
 const HDR = () => ({ Authorization:`Bearer ${MP()}`, 'Content-Type':'application/json', 'X-Idempotency-Key': uuid() });
 
@@ -27,7 +29,7 @@ async function createPixPayment(amount, description, email, name, cpf, external_
     description,
     payment_method_id: 'pix',
     payer,
-    notification_url: 'https://lavish-cooperation-production-2575.up.railway.app/api/pay/webhook',
+    notification_url: MP_WEBHOOK_URL,
     external_reference: String(external_reference || ''),
   };
   const { data } = await axios.post('https://api.mercadopago.com/v1/payments', payload, { headers: HDR() });
@@ -55,6 +57,8 @@ router.post('/deposit', auth, async (req, res) => {
       .run(pix.id, pix.qr_code, pix.qr_code_base64, deposit_id);
     res.json({ deposit_id, ...pix });
   } catch(e) {
+    // Rollback: marca registro como falho se já foi criado
+    try { db.prepare("UPDATE deposits SET status='failed' WHERE user_id=? AND status='pending' AND amount=?").run(req.user.id, amount); } catch {}
     console.error('MP deposit error:', e.response?.data || e.message);
     res.status(500).json({ error: 'Erro ao gerar PIX. Verifique o token MP.' });
   }
@@ -83,6 +87,8 @@ router.post('/order', auth, async (req, res) => {
       .run(pix.id, pix.qr_code, pix.qr_code_base64, order_id);
     res.json({ order_id, total, unit_price, ...pix });
   } catch(e) {
+    // Rollback: marca pedido como falho se já foi criado
+    try { db.prepare("UPDATE orders SET status='failed' WHERE user_id=? AND product_id=? AND quantity=? AND status='pending'").run(req.user.id, product_id, quantity); } catch {}
     console.error('MP order error:', e.response?.data || e.message);
     res.status(500).json({ error: 'Erro ao gerar PIX.' });
   }
@@ -100,10 +106,10 @@ router.post('/balance', auth, async (req, res) => {
   if (user.balance < total) return res.status(400).json({ error: `Saldo insuficiente. Disponível: R$ ${user.balance.toFixed(2)}` });
   try {
     const result = db.deliverCodes(req.user.id, product_id, quantity, unit_price, total, null);
-    // Send email notification after purchase
-    await sendPurchaseEmail(req.user.id, total, product_id, quantity);
     const updated = db.prepare("SELECT balance FROM users WHERE id=?").get(req.user.id);
     res.json({ ...result, balance: updated.balance });
+    // Email assíncrono — não afeta a resposta
+    sendPurchaseEmail(req.user.id, total, product_id, quantity).catch(e => console.error('[email] falha:', e.message));
   } catch(e) { res.status(400).json({ error: e.message }); }
 });
 
@@ -134,7 +140,7 @@ function settlePayment(mpId) {
     try { db.deliverCodes(ord.user_id, ord.product_id, ord.quantity, ord.unit_price, ord.total, ord.id); }
     catch (e) { console.error('[settle] deliverCodes error:', e.message); return null; }
     // Send email notification after order confirmed
-    sendPurchaseEmail(ord.user_id, ord.total, ord.product_id, ord.quantity);
+    sendPurchaseEmail(ord.user_id, ord.total, ord.product_id, ord.quantity).catch(e => console.error('[email] falha:', e.message));
     console.log(`✅ [settle] Pedido #${ord.id} aprovado`);
     return 'order';
   }
