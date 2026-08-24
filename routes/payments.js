@@ -7,12 +7,26 @@ const { auth } = require('./middleware');
 const MP  = () => process.env.MP_ACCESS_TOKEN;
 const HDR = () => ({ Authorization:`Bearer ${MP()}`, 'Content-Type':'application/json', 'X-Idempotency-Key': uuid() });
 
-async function createPixPayment(amount, description, email, name) {
+// Validação completa de CPF (dígitos verificadores)
+function cpfValido(v) {
+  const c = String(v || '').replace(/\D/g, '');
+  if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+  let s = 0; for (let i = 0; i < 9; i++) s += +c[i] * (10 - i);
+  if (((s * 10) % 11) % 10 !== +c[9]) return false;
+  s = 0; for (let i = 0; i < 10; i++) s += +c[i] * (11 - i);
+  return ((s * 10) % 11) % 10 === +c[10];
+}
+
+// CPF usado SOMENTE na transação: vai direto ao Mercado Pago no payload do pagamento
+// e NUNCA é gravado em nosso banco de dados.
+async function createPixPayment(amount, description, email, name, cpf) {
+  const payer = { email, first_name: name };
+  if (cpf) payer.identification = { type: 'CPF', number: cpf };
   const { data } = await axios.post('https://api.mercadopago.com/v1/payments', {
     transaction_amount: parseFloat(amount),
     description,
     payment_method_id: 'pix',
-    payer: { email, first_name: name }
+    payer
   }, { headers: HDR() });
   return {
     id: String(data.id),
@@ -26,9 +40,11 @@ async function createPixPayment(amount, description, email, name) {
 router.post('/deposit', auth, async (req, res) => {
   const { amount } = req.body;
   if (!amount || amount < 1) return res.status(400).json({ error: 'Valor mínimo R$ 1,00.' });
+  const cpf = String(req.body.cpf || '').replace(/\D/g, '');
+  if (!cpfValido(cpf)) return res.status(400).json({ error: 'CPF inválido. Confira os números e tente novamente.' });
   const user = db.prepare("SELECT * FROM users WHERE id=?").get(req.user.id);
   try {
-    const pix = await createPixPayment(amount, `Depósito PanelReseller - ${user.name}`, user.email, user.name);
+    const pix = await createPixPayment(amount, `Depósito PanelReseller - ${user.name}`, user.email, user.name, cpf);
     const dep = db.prepare("INSERT INTO deposits (user_id,amount,mp_payment_id,mp_qr_code,mp_qr_b64) VALUES (?,?,?,?,?)")
       .run(req.user.id, amount, pix.id, pix.qr_code, pix.qr_code_base64);
     res.json({ deposit_id: dep.lastInsertRowid, ...pix });
@@ -45,12 +61,14 @@ router.post('/order', auth, async (req, res) => {
   const user    = db.prepare("SELECT * FROM users WHERE id=?").get(req.user.id);
   const product = db.prepare("SELECT * FROM products WHERE id=? AND active=1").get(product_id);
   if (!product) return res.status(404).json({ error: 'Produto não encontrado.' });
+  const cpf = String(req.body.cpf || '').replace(/\D/g, '');
+  if (!cpfValido(cpf)) return res.status(400).json({ error: 'CPF inválido. Confira os números e tente novamente.' });
   const unit_price = db.calcPrice(product_id, quantity);
   const total      = unit_price * quantity;
   const avail      = db.prepare("SELECT COUNT(*) as c FROM codes WHERE product_id=? AND used=0").get(product_id).c;
   if (avail < quantity) return res.status(400).json({ error: `Estoque insuficiente. Disponível: ${avail}` });
   try {
-    const pix = await createPixPayment(total, `${product.name} ×${quantity}`, user.email, user.name);
+    const pix = await createPixPayment(total, `${product.name} ×${quantity}`, user.email, user.name, cpf);
     const ord = db.prepare("INSERT INTO orders (user_id,product_id,quantity,unit_price,total,status,mp_payment_id,mp_qr_code,mp_qr_b64) VALUES (?,?,?,?,?,'pending',?,?,?)")
       .run(req.user.id, product_id, quantity, unit_price, total, pix.id, pix.qr_code, pix.qr_code_base64);
     res.json({ order_id: ord.lastInsertRowid, total, unit_price, ...pix });

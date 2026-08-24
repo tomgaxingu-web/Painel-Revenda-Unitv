@@ -703,6 +703,11 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
   <div class="cp">
     <div class="cp-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Gerar QR Code PIX</div>
     <div class="ff"><div class="ffl">Valor do depósito</div><input class="ffi" type="number" id="dAmt" placeholder="0,00" min="1" step="0.01" style="font-size:26px;font-weight:800;letter-spacing:-.5px"/></div>
+    <div class="ff" style="margin-top:12px"><div class="ffl">CPF do titular do pagamento</div><input class="ffi" id="depCpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off"/></div>
+    <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.7;display:flex;gap:6px;align-items:flex-start">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" style="flex-shrink:0;margin-top:1px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <span>Usado apenas para o Mercado Pago validar seu PIX. <strong style="color:var(--t2)">Não armazenamos seu documento</strong> em nossos servidores.</span>
+    </div>
     <div class="qa" style="margin-bottom:18px">
       <div class="ach" onclick="sD(10)">R$ 10</div><div class="ach" onclick="sD(20)">R$ 20</div>
       <div class="ach" onclick="sD(50)">R$ 50</div><div class="ach" onclick="sD(100)">R$ 100</div>
@@ -789,6 +794,20 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
     <div class="ff" style="margin-top:12px"><div class="ffl">Nova senha (mínimo 6 caracteres)</div><input class="ffi" type="password" id="pwNew" placeholder="••••••••" autocomplete="new-password"/></div>
     <div style="margin-top:16px"><button class="btn btn-p btn-sm" onclick="svPass()">Alterar senha</button></div>
   </div>
+  <div class="cp" style="margin-top:16px">
+    <div class="ph" style="padding:0 0 14px;display:flex;align-items:center;gap:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="pt" style="font-size:15px">Seus dados e privacidade</div>
+    </div>
+    <p style="font-size:13px;color:var(--t2);line-height:1.9;margin:0">
+      O CPF é solicitado <strong>apenas no momento do pagamento</strong> e tem um único propósito: permitir que o Mercado Pago valide e efetive sua transação PIX com segurança, evitando erros e recusas indevidas.
+    </p>
+    <div style="font-size:12.5px;color:var(--t2);line-height:2;margin-top:12px">
+      ✅ <strong>Não guardamos seu documento</strong> em nossos servidores.<br/>
+      ✅ Ele não é usado para nenhum outro fim — nada de marketing, cadastro ou compartilhamento.<br/>
+      ✅ Por conveniência, fica salvo somente no <strong>seu próprio navegador</strong>, e apenas até você apagar.
+    </div>
+  </div>
 </div>
 
 </div></main>
@@ -803,6 +822,11 @@ tbody tr:hover td{background:rgba(124,58,237,.04)}
   <div class="mh"><div><div class="mt" id="bT"></div><div class="ms" id="bS"></div></div><button class="mcl" onclick="cm('mBuy')">×</button></div>
   <div class="ff"><div class="ffl">Quantidade</div>
     <div class="qr"><input class="qi" type="number" id="bQ" min="1" value="1" oninput="cB()"/><div class="qcs" id="bCs"></div></div>
+  </div>
+  <div class="ff" style="margin-top:12px"><div class="ffl">CPF do titular do pagamento</div><input class="ffi" id="buyCpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off"/></div>
+  <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.7;display:flex;gap:6px;align-items:flex-start">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" style="flex-shrink:0;margin-top:1px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    <span>Usado apenas para o Mercado Pago validar seu PIX. <strong style="color:var(--t2)">Não armazenamos seu documento</strong> em nossos servidores.</span>
   </div>
   <div class="tb2"><div class="tb2-l">Total a pagar</div><div class="tb2-v" id="bTot">R$ 0,00</div><div class="tb2-d" id="bDet"></div></div>
   <div class="bn ok" id="bn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span id="bnT"></span></div>
@@ -905,7 +929,7 @@ function boot(){
   const a=$('auth');a.classList.add('out');setTimeout(()=>a.style.display='none',520);
   $('app').classList.add('on');
   if(USR?.role==='admin')$('aN').style.display='block';
-  lusr();lprods();go('inicio');iSSE();
+  cpfPrefill();lusr();lprods();go('inicio');iSSE();
 }
 
 async function lusr(){
@@ -1084,7 +1108,7 @@ function aCompra(id){
   $('bQ').value=1;
   const s=[...buyP.tiers].sort((a,b)=>a.min_qty-b.min_qty);
   $('bCs').innerHTML=s.map(t=>`<div class="qc" onclick="sQ(${t.min_qty},this)">${t.min_qty}×</div>`).join('');
-  cB();om('mBuy');
+  cpfPrefill();cB();om('mBuy');
 }
 function sQ(v,el){$('bQ').value=v;document.querySelectorAll('.qc').forEach(c=>c.classList.remove('on'));el.classList.add('on');cB()}
 function cB(){
@@ -1108,10 +1132,22 @@ async function pSaldo(){
   }catch(e){toast(e.message,'red')}
   finally{b.disabled=false;b.textContent='✅ Pagar com Saldo'}
 }
+// CPF do pagamento: validado no navegador, enviado só na transação PIX.
+// Fica salvo apenas no localStorage do próprio dispositivo (nunca no servidor).
+function validaCPF(v){const c=String(v||'').replace(/\D/g,'');if(c.length!==11||/^(\d)\1{10}$/.test(c))return false;
+let s=0;for(let i=0;i<9;i++)s+=+c[i]*(10-i);if(((s*10)%11)%10!=+c[9])return false;
+s=0;for(let i=0;i<10;i++)s+=+c[i]*(11-i);return ((s*10)%11)%10==+c[10]}
+function getCpf(id){const el=$(id),d=(el.value||'').replace(/\D/g,'');
+if(!validaCPF(d)){toast('Informe um CPF válido para o pagamento','red');el.focus();return null}
+try{localStorage.setItem('painel_cpf',d)}catch(e){}
+return d}
+function cpfPrefill(){try{const c=localStorage.getItem('painel_cpf');if(!c)return;
+['buyCpf','depCpf'].forEach(i=>{const e=$(i);if(e&&!e.value)e.value=c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')})}catch(e){}}
 async function pPix(){
   const q=parseInt($('bQ').value)||1,b=$('bPix');
+  const cpf=getCpf('buyCpf');if(!cpf)return;
   b.disabled=true;b.innerHTML='<div class="sp"></div> Gerando PIX...';
-  try{const d=await api('POST','/pay/order',{product_id:buyP.id,quantity:q});cm('mBuy');aPix(d,`${buyP.name} ×${q}`,fmt(d.total))}
+  try{const d=await api('POST','/pay/order',{product_id:buyP.id,quantity:q,cpf});cm('mBuy');aPix(d,`${buyP.name} ×${q}`,fmt(d.total))}
   catch(e){toast(e.message,'red')}
   finally{b.disabled=false;b.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> Pagar com PIX'}
 }
@@ -1149,7 +1185,8 @@ function cpPix(){const c=$('pxCode').textContent;if(!c){toast('Código vazio','r
 // DEPÓSITO
 function sD(v){$('dAmt').value=v}
 async function gDep(){const a=parseFloat($('dAmt').value);if(!a||a<1){toast('Mínimo R$ 1,00','red');return}
-  try{const d=await api('POST','/pay/deposit',{amount:a});aPix(d,`Depósito via PIX — ${fmt(a)}`)}catch(e){toast(e.message,'red')}}
+  const cpf=getCpf('depCpf');if(!cpf)return;
+  try{const d=await api('POST','/pay/deposit',{amount:a,cpf});aPix(d,`Depósito via PIX — ${fmt(a)}`)}catch(e){toast(e.message,'red')}}
 async function lDepH(){
   try{const ds=await api('GET','/user/deposits');
     $('dHistW').innerHTML=ds.length?`
